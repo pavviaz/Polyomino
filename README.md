@@ -20,7 +20,7 @@ Then use
 ```bash
 python main.py
 ```
-for launch prog
+for launch solver.
 
 ### Configure problem
 
@@ -88,7 +88,6 @@ So I have:
 W - field width
 
 H - field height
-
 
 pCount - polyominos count
 
