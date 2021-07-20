@@ -4,7 +4,7 @@ from Parser import Parser
 
 parser = Parser()
 parser.getField().info()
-for polyomino in parser.getLPolyominoList() + parser.getRectPolyominoList():
+for polyomino in parser.getAllPolyominos():
 	polyomino.info()
 
 executor = Executor(parser)

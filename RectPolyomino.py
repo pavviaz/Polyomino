@@ -1,18 +1,28 @@
 
 from Polyomino import Polyomino
+import numpy as np
+
 
 class RectPolyomino(Polyomino):
-	def __init__(self, id, height, width) -> None:
+	def __init__(self, id, height, width):
 		super().__init__(id, height, width)
+		self.setShapesCount()
 
-	def getPossibleShapes(self):
-		shapes = []
+	def setShapesCount(self):
+		self.shapesCount = 1 if self.getHeight() == self.getWidth() else 2
 
-		shapes.append({
-			(x, y) for x in range(self.getWidth()) for y in range(self.getHeight())
-		})
-		if (self.getHeight() != self.getWidth()):
-			shapes.append({
-				(x, y) for x in range(self.getWidth()) for y in range(self.getHeight())
-			})
+	def getArea(self):
+		return self.getHeight() * self.getWidth()
+
+	def getShape(self):
+		return [np.array((x, y)) for y in range(self.getHeight()) for x in range(self.getWidth())]
+
+	def getShapes(self):
+		shapes = np.array([[np.array((x, y)) for y in range(self.getHeight()) for x in range(self.getWidth())]])
+		if self.shapesCount > 1:
+			shapes = np.append(
+				shapes,
+				[[np.array((x, y)) for y in range(self.getWidth()) for x in range(self.getHeight())]],
+				axis=0
+			)
 		return shapes

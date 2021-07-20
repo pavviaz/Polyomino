@@ -4,6 +4,7 @@ from utils import getSeparateLine
 class Polyomino:
 	def __init__(self, id, height, width) -> None:
 		self.__id = id
+		self.shapesCount = 0
 		self.setSize(height, width)
 
 	def getName(self):
@@ -14,9 +15,6 @@ class Polyomino:
 
 	def getId(self):
 		return self.__id
-
-	def getArea(self):
-		return self.__height * self.__width
 
 	def getWidth(self):
 		return self.__width
