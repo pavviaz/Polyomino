@@ -1,11 +1,9 @@
 
 from Executor import Executor
-from Parser import Parser
+from JSONParser import JSONParser
 
-parser = Parser()
-parser.getField().info()
-for polyomino in parser.getLPolyominoList() + parser.getRectPolyominoList():
-	polyomino.info()
+parser = JSONParser("config.json")
+parser.parse()
 
 executor = Executor(parser)
 executor.solve()

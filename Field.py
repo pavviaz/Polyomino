@@ -1,9 +1,14 @@
 
 from utils import getSeparateLine
 
+
 class Field:
-	def __init__(self) -> None:
-		self.setSize()
+	def __init__(self, width=None, height=None) -> None:
+		if not width and not height:
+			self.setSize()
+		else:
+			self.width = width
+			self.height = height
 
 	def setSize(self):
 		self.width, self.height = list(map(lambda x: int(x), input("Enter width and heigth of the Field (use space to separate): ").split()))
