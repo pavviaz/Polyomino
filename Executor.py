@@ -34,7 +34,7 @@ class Executor:
         self.setVariables()
         self.addConstraints()
         self.configureSolver()
-        self.findSolution()
+        return self.findSolution()
 
     def addShapesConstraint(self):
         for pmino in self.parser.getPolyominos():

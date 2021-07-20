@@ -6,4 +6,6 @@ parser = JSONParser("config.json")
 parser.parse()
 
 executor = Executor(parser)
-executor.solve()
+answer = executor.solve()
+
+print(f"Answer: {answer}")
