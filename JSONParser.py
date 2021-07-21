@@ -35,16 +35,20 @@ class JSONParser:
         lPminos = data[L_POLYOMINO]
         rectPminos = data[RECT_POLYOMINO]
 
-        for pData in lPminos + rectPminos:
+        for pData in lPminos:
             for _ in range(pData[CAPACITY]):
                 width = pData[WIDTH]
                 height = pData[HEIGHT]
-                self.polyominos.append(
-                    LPolyomino(self.pId, height, width)
-                    if self.pId < len(lPminos)
-                    else RectPolyomino(self.pId, height, width)
-                )
+                self.polyominos.append(LPolyomino(self.pId, height, width))
                 self.pId += 1
+
+        for pData in rectPminos:
+            for _ in range(pData[CAPACITY]):
+                width = pData[WIDTH]
+                height = pData[HEIGHT]
+                self.polyominos.append(RectPolyomino(self.pId, height, width))
+                self.pId += 1
+
 
     def getPolyominos(self):
         return self.polyominos

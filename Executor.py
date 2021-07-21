@@ -95,7 +95,7 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
         fieldSize = self.field.getSize()
 
-        plt.figure(figsize=(2, 2))
+        plt.figure(figsize=(5, 5))
         plt.grid(True)
         plt.axis([0, fieldSize[0], fieldSize[1], 0])
         plt.yticks(np.arange(0, fieldSize[1], 1.0))
@@ -107,6 +107,10 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
                 x = self.Value(cell[0])
                 y = self.Value(cell[1])
                 rect = plt.Rectangle((x, y), 1, 1, facecolor=color)
+                plt.annotate(
+                    str(pId),
+                    (x + .5, y + .5)
+                )
                 plt.gca().add_patch(rect)
 
         plt.show()
