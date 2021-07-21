@@ -71,6 +71,8 @@ Example of JSON-configuration file:
   ]
 }
 ```
+By default, configuration file should be called configure.json. You can change it in main.py
+
 It shows possible decision if it exists and nothing if it's not.
 
 ![image](https://user-images.githubusercontent.com/57394771/126393713-9b749ccf-907a-4eb0-8fb1-f0e5708a92a0.png)
