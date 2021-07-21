@@ -16,6 +16,11 @@ pip install <moduleName>
 ```
 for installing all necessary stuff.
 
+Or
+```bash
+pip install -r requirements.txt
+```
+
 Then use 
 ```bash
 python main.py
