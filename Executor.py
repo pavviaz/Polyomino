@@ -1,6 +1,5 @@
-
 import numpy as np
-import matplotlib.pyplot as plt
+import time
 import more_itertools as mit
 from Parser import Parser
 from ortools.sat.python import cp_model
@@ -9,20 +8,21 @@ from ortools.sat.python import cp_model
 class Executor:
     def __init__(self, parser: Parser):
         self.parser = parser
-        self.model = cp_model.CpModel()
+        self.model = cp_model.CpModel()   # инициализация CP-SAT
         self.pminosMtrx = [[] for _ in range(self.parser.getPolyominosCount())]
 
     def setVariables(self):
+        # создание матриц из координат фигур
         for pmino in self.parser.getAllPolyominos():
             cells = []
-            for cell in range(pmino.getArea()):
+            for cell in range(pmino.getArea()):  
                 cells.append(
                     np.array([
                         self.model.NewIntVar(0, self.parser.getField().getSize()[0] - 1, 'p%i' % pmino.getId() + 'c%i' % cell + 'x'),
                         self.model.NewIntVar(0, self.parser.getField().getSize()[1] - 1, 'p%i' % pmino.getId() + 'c%i' % cell + 'y')
                     ])
                 )
-            self.pminosMtrx[pmino.getId()] = [
+            self.pminosMtrx[pmino.getId()] = [   # создание матрицы из координат фигур 
                 [
                     self.model.NewBoolVar('p%i' % pmino.getId() + 's%i' % shapeId)
                     for shapeId in range(pmino.shapesCount)
@@ -34,9 +34,10 @@ class Executor:
         self.setVariables()
         self.addConstraints()
         self.configureSolver()
-        self.findSolution()
+        return self.findSolution()
 
     def addShapesConstraint(self):
+        # добавление ограничений для форм фигур
         for pmino in self.parser.getAllPolyominos():
             shapes, cells = self.pminosMtrx[pmino.getId()]
             topCell = cells[0]
@@ -47,13 +48,14 @@ class Executor:
             self.model.AddBoolXOr(shapes)
 
     def addOverlapConstraint(self):
+        # добавление ограничений для наложения фигур
         cells = set(np.arange(self.parser.getField().getSize()[0] * self.parser.getField().getSize()[1]))  # Cells where polyominoes can be fitted
         ranges = [(next(g), list(g)[-1]) for g in
                   mit.consecutive_groups(cells)]  # All intervals in the stack of active cells
 
         cellsAddresses = []
         n = 0
-        for pId, (_, cells) in enumerate(self.pminosMtrx):
+        for _, (_, cells) in enumerate(self.pminosMtrx):
             for cell in cells:
                 n += 1
                 cellAddress = self.model.NewIntVarFromDomain(cp_model.Domain.FromIntervals(ranges), '%i' % n)
@@ -63,66 +65,23 @@ class Executor:
         self.model.AddAllDifferent(cellsAddresses)
 
     def addConstraints(self):
+        # добавление огриничений
         self.addShapesConstraint()
         self.addOverlapConstraint()
 
     def configureSolver(self):
+        # создания экземпляра класса "решателя" SAT
         self.__solver = cp_model.CpSolver()
-        self.__solutionPrinter = SolutionPrinter(self.pminosMtrx, self.parser.getField())
 
     def findSolution(self):
-        self.__status = self.__solver.Solve(self.model, self.__solutionPrinter)
-
-        print(f"Status = {self.__solver.StatusName(self.__status)}")
+        # запуск "решателя" 
+        cur_time = time.time()
+        self.__status = self.__solver.Solve(self.model)
+        print(self.__status in (cp_model.OPTIMAL, cp_model.FEASIBLE)) 
+        return time.time() - cur_time
 
     def getPolyominos(self):
         return self.parser.getRectPolyominoList()
 
-    def getPolynomosCount(self):
-        return self.parser.getPolyominosCount()
-
     def getPolyomino(self, pId):
         return self.getPolyominos()[pId - 1]
-
-    def getFieldWidth(self):
-        return self.__fieldWidth
-
-    def getFieldHeight(self):
-        return self.__fieldHeight
-
-    def printField(self):
-        for i in range(len(self.__fieldMatrix)):
-            print(*self.__fieldMatrix[i])
-
-
-class SolutionPrinter(cp_model.CpSolverSolutionCallback):
-    ''' Print a solution. '''
-
-    def __init__(self, variables, field):
-        cp_model.CpSolverSolutionCallback.__init__(self)
-        self.variables = variables
-        self.field = field
-        self.count = 0
-
-    def OnSolutionCallback(self):
-        self.count += 1
-
-        fieldSize = self.field.getSize()
-
-        plt.figure(figsize=(2, 2))
-        plt.grid(True)
-        plt.axis([0, fieldSize[0], fieldSize[1], 0])
-        plt.yticks(np.arange(0, fieldSize[1], 1.0))
-        plt.xticks(np.arange(0, fieldSize[0], 1.0))
-
-        colors = ('#FA5454', '#21D3B6', '#3384FA', '#FFD256', '#62ECFA')
-        cdict = dict(zip([i for i in range(5)], colors)) #Color dictionary for plotting
-
-        for pId, (_, cells) in enumerate(self.variables):
-            for cell in cells:
-                x = self.Value(cell[0])
-                y = self.Value(cell[1])
-                rect = plt.Rectangle((x, y), 1, 1, fc=cdict[pId])
-                plt.gca().add_patch(rect)
-
-        plt.show()

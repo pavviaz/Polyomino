@@ -1,4 +1,3 @@
-
 from Polyomino import Polyomino
 import numpy as np
 
@@ -36,4 +35,5 @@ class LPolyomino(Polyomino):
 			])
 		])
 		shapes = np.append(shapes, shapes * -1, axis=0)
+		shapes[:, :, 1] *= -1  # reflect shapes vertically (y-axis)
 		return shapes
